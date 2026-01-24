@@ -16,13 +16,13 @@ export class VectorStoreService {
     // Defer initialization until first use to ensure ConfigService is available
   }
 
-  private async ensureInitialized(): Promise<void> {
+  private ensureInitialized(): void {
     if (!this.chromaStore) {
-      await this.initializeVectorStore();
+      this.initializeVectorStore();
     }
   }
 
-  private async initializeVectorStore(): Promise<void> {
+  private initializeVectorStore(): void {
     try {
       const collectionName = this.configService.get<string>(
         'VECTOR_COLLECTION_NAME',
@@ -53,7 +53,7 @@ export class VectorStoreService {
    * @returns Promise<string[]> - Array of document IDs
    */
   async addDocuments(documents: Document[]): Promise<string[]> {
-    await this.ensureInitialized();
+    this.ensureInitialized();
     if (!this.chromaStore) {
       throw new Error('Failed to initialize vector store');
     }
@@ -81,7 +81,7 @@ export class VectorStoreService {
     texts: string[],
     metadatas?: Record<string, any>[],
   ): Promise<string[]> {
-    await this.ensureInitialized();
+    this.ensureInitialized();
     if (!this.chromaStore) {
       throw new Error('Failed to initialize vector store');
     }
@@ -117,7 +117,7 @@ export class VectorStoreService {
     k: number = 5,
     filter?: Record<string, any>,
   ): Promise<Document[]> {
-    await this.ensureInitialized();
+    this.ensureInitialized();
     if (!this.chromaStore) {
       throw new Error('Failed to initialize vector store');
     }
@@ -146,7 +146,7 @@ export class VectorStoreService {
     k: number = 5,
     filter?: Record<string, any>,
   ): Promise<[Document, number][]> {
-    await this.ensureInitialized();
+    this.ensureInitialized();
     if (!this.chromaStore) {
       throw new Error('Failed to initialize vector store');
     }
@@ -199,8 +199,8 @@ export class VectorStoreService {
    * Get the underlying Chroma vector store instance
    * @returns Chroma - The LangChain Chroma instance
    */
-  async getVectorStore(): Promise<Chroma> {
-    await this.ensureInitialized();
+  getVectorStore(): Chroma {
+    this.ensureInitialized();
     return this.chromaStore!;
   }
 

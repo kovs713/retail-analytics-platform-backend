@@ -12,13 +12,13 @@ export class LLMService {
     // Defer initialization until first use to ensure ConfigService is available
   }
 
-  private async ensureInitialized(): Promise<void> {
+  private ensureInitialized(): void {
     if (!this.llm) {
-      await this.initializeLLM();
+      this.initializeLLM();
     }
   }
 
-  private async initializeLLM(): Promise<void> {
+  private initializeLLM(): void {
     const apiKey = this.configService.get<string>('GROQ_API_KEY');
     const model = this.configService.get<string>(
       'GROQ_MODEL',
@@ -48,7 +48,7 @@ export class LLMService {
    * @returns Promise<string> - The generated response
    */
   async generateText(prompt: string, systemMessage?: string): Promise<string> {
-    await this.ensureInitialized();
+    this.ensureInitialized();
     if (!this.llm) {
       throw new Error('Failed to initialize LLM service');
     }
@@ -77,7 +77,7 @@ export class LLMService {
   async generateWithMessages(
     messages: (HumanMessage | SystemMessage)[],
   ): Promise<string> {
-    await this.ensureInitialized();
+    this.ensureInitialized();
     if (!this.llm) {
       throw new Error('Failed to initialize LLM service');
     }
@@ -98,8 +98,8 @@ export class LLMService {
    * Get the underlying ChatGroq instance for advanced usage
    * @returns Promise<ChatGroq> - The LangChain ChatGroq instance
    */
-  async getLLM(): Promise<ChatGroq> {
-    await this.ensureInitialized();
+  getLLM(): ChatGroq {
+    this.ensureInitialized();
     if (!this.llm) {
       throw new Error('Failed to initialize LLM service');
     }

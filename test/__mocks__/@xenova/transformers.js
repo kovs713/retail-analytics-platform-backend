@@ -1,4 +1,3 @@
-// test/__mocks__/@xenova/transformers.js
 const mockPipeline = jest.fn().mockImplementation(() => ({
   // Mock pipeline function that returns fake embeddings
 }));

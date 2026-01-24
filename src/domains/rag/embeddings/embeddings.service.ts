@@ -1,6 +1,6 @@
 import { Embeddings } from '@langchain/core/embeddings';
 import { Injectable, Logger } from '@nestjs/common';
-import { pipeline } from '@xenova/transformers';
+import { XenovaEmbeddings } from './xenovaEmbeddings.impl';
 
 @Injectable()
 export class EmbeddingsService {
@@ -78,58 +78,5 @@ export class EmbeddingsService {
       this.initializeEmbeddings();
     }
     return this.embeddingsInstance!;
-  }
-}
-
-// Custom Xenova embeddings class implementing LangChain Embeddings interface
-class XenovaEmbeddings extends Embeddings {
-  private extractor: any = null;
-
-  constructor() {
-    super({});
-    void this.initializeExtractor();
-  }
-
-  private async initializeExtractor() {
-    try {
-      this.extractor = await pipeline(
-        'feature-extraction',
-        'Xenova/all-MiniLM-L6-v2',
-      );
-    } catch (error) {
-      console.error('Failed to initialize extractor:', error);
-      throw error;
-    }
-  }
-
-  async embedQuery(text: string): Promise<number[]> {
-    if (!this.extractor) {
-      await this.initializeExtractor();
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-    const output = await this.extractor(text, {
-      pooling: 'mean',
-      normalize: true,
-    });
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-    return Array.from(output.data);
-  }
-
-  async embedDocuments(texts: string[]): Promise<number[][]> {
-    if (!this.extractor) {
-      await this.initializeExtractor();
-    }
-
-    const embeddings: number[][] = [];
-    for (const text of texts) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-      const output = await this.extractor(text, {
-        pooling: 'mean',
-        normalize: true,
-      });
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-      embeddings.push(Array.from(output.data));
-    }
-    return embeddings;
   }
 }

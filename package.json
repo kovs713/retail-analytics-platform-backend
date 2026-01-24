@@ -1,5 +1,5 @@
 {
-  "name": "pet-garden-backend",
+  "name": "retail-analytics-platform-backend",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -13,17 +13,19 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
+    "test": "jest --testPathIgnorePatterns=integration",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/e2e/jest-e2e.json",
+    "test:rag": "jest test/integration/rag-integration.spec.ts",
+    "docker:build": "docker build -t retail-analytics-platform-backend .",
+    "docker:run": "docker run -p 3000:3000 retail-analytics-platform-backend"
   },
   "dependencies": {
     "@langchain/community": "^1.0.4",
     "@langchain/core": "^1.0.6",
     "@langchain/groq": "^1.0.1",
-    "@langchain/textsplitters": "^1.0.0",
     "@nestjs/common": "^11.1.9",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.9",
@@ -34,16 +36,12 @@
     "chromadb": "^3.1.7",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
-    "langchain": "^1.0.6",
-    "multer": "^2.0.2",
+    "globals": "^17.1.0",
     "pg": "^8.16.3",
     "redis": "^5.10.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
-    "sharp": "0.32.6",
-    "typeorm": "^0.3.27",
-    "uuid": "^13.0.0",
-    "zod": "^4.1.12"
+    "typeorm": "^0.3.27"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
@@ -59,10 +57,8 @@
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
-    "globals": "^16.5.0",
     "jest": "^30.2.0",
     "prettier": "^3.6.2",
-    "source-map-support": "^0.5.21",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.5",
     "ts-loader": "^9.5.4",
@@ -86,7 +82,10 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "roots": [
+      "<rootDir>",
+      "test"
+    ],
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
@@ -96,13 +95,17 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@xenova/transformers)/)"
+    ],
     "moduleNameMapper": {
       "^@/app/(.*)$": "<rootDir>/src/$1",
       "^@/api/(.*)$": "<rootDir>/src/api/$1",
       "^@/common/(.*)$": "<rootDir>/src/common/$1",
       "^@/database/(.*)$": "<rootDir>/src/database/$1",
       "^@/guards/(.*)$": "<rootDir>/src/guards/$1",
-      "^@/modules/(.*)$": "<rootDir>/src/modules/$1"
+      "^@/modules/(.*)$": "<rootDir>/src/modules/$1",
+      "^@xenova/transformers$": "<rootDir>/test/__mocks__/@xenova/transformers.js"
     }
   }
 }

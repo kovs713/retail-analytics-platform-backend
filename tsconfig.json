@@ -20,7 +20,7 @@
       "@/common/*": ["./src/common/*"],
       "@/config/*": ["./src/config/*"],
       "@/database/*": ["./src/database/*"],
-      "@/guards/*": ["./src/guards/*"],
+      "@/guards/*": ["src/domains/auth/guards/*"],
       "@/modules/*": ["./src/modules/*"]
     },
     "incremental": true,

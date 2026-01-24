@@ -2,17 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [master, dev]
   pull_request:
-    branches: [main]
+    branches: [master, dev]
 
 jobs:
-  lint-and-test:
+  test:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [20.x]
 
     steps:
       - name: Checkout code
@@ -21,25 +17,28 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 10
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20
           cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Type check
-        run: npx tsc --noEmit
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Check formatting
-        run: npm run format -- --check
+      - name: Run linter
+        run: pnpm lint
 
       - name: Run unit tests
-        run: npm run test
+        run: pnpm test -- --watchAll=false
+
+      - name: Run integration tests
+        run: pnpm test:rag
+
+      - name: Run E2E tests
+        run: pnpm test:e2e
+
+      - name: Build application
+        run: pnpm build

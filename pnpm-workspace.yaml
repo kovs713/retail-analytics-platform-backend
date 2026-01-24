@@ -1,6 +1,10 @@
+packages:
+  - .
+
 ignoredBuiltDependencies:
   - '@nestjs/core'
   - '@scarf/scarf'
+  - onnxruntime-node
   - protobufjs
   - unrs-resolver
 

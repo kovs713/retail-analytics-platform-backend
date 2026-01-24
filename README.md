@@ -37,9 +37,9 @@ pnpm install
 
 # Copy environment configuration
 cp .env.example .env
-
-# Configure environment variables (see Configuration section)
 ```
+
+## Configure environment variables (see Configuration section)
 
 ### Database Setup
 

@@ -15,13 +15,27 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "@/app/*": ["./src/*"],
-      "@/api/*": ["./src/api/*"],
-      "@/common/*": ["./src/common/*"],
-      "@/config/*": ["./src/config/*"],
-      "@/database/*": ["./src/database/*"],
-      "@/guards/*": ["src/domains/auth/guards/*"],
-      "@/modules/*": ["./src/modules/*"]
+      "@/app/*": [
+        "./src/*"
+      ],
+      "@/api/*": [
+        "./src/api/*"
+      ],
+      "@/common/*": [
+        "./src/common/*"
+      ],
+      "@/config/*": [
+        "./src/config/*"
+      ],
+      "@/database/*": [
+        "./src/database/*"
+      ],
+      "@/domains/*": [
+        "./src/domains/*"
+      ],
+      "@/guards/*": [
+        "src/domains/auth/guards/*"
+      ]
     },
     "incremental": true,
     "skipLibCheck": true,

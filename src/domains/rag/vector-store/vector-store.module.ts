@@ -1,4 +1,4 @@
-import { EmbeddingsModule } from '@/modules/embeddings/embeddings.module';
+import { EmbeddingsModule } from '@/domains/rag/embeddings/embeddings.module';
 import { Module } from '@nestjs/common';
 import { VectorStoreService } from './vector-store.service';
 

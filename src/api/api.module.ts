@@ -1,9 +1,9 @@
+import * as domainModules from '@/domains/index';
 import { Module } from '@nestjs/common';
-import * as modules from '../modules';
 import { RagController } from './rag/rag.controller';
 
 @Module({
-  imports: Object.values(modules),
+  imports: Object.values(domainModules),
   controllers: [RagController],
 })
 export class ApiModule {}

@@ -1,8 +1,8 @@
 import { RagController } from '@/api/rag/rag.controller';
-import { EmbeddingsModule } from '@/modules/embeddings/embeddings.module';
-import { LLMModule } from '@/modules/llm/llm.module';
-import { RagService } from '@/modules/rag/rag.service';
-import { VectorStoreModule } from '@/modules/vector-store/vector-store.module';
+import { EmbeddingsModule } from '@/domains/rag/embeddings/embeddings.module';
+import { LLMModule } from '@/domains/rag/llm/llm.module';
+import { RagService } from '@/domains/rag/rag.service';
+import { VectorStoreModule } from '@/domains/rag/vector-store/vector-store.module';
 import { Module } from '@nestjs/common';
 
 @Module({

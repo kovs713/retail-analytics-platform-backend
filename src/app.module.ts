@@ -7,7 +7,7 @@ import {
   LLMModule,
   RagModule,
   VectorStoreModule,
-} from './modules';
+} from './domains';
 
 @Module({
   imports: [

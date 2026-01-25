@@ -1,8 +1,34 @@
-import { Module } from '@nestjs/common';
+import { EmbeddingsExtractor } from '@/common/types/providers.type';
+import { DynamicModule, Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { FeatureExtractionPipeline, pipeline } from '@xenova/transformers';
 import { EmbeddingsService } from './embeddings.service';
 
-@Module({
-  providers: [EmbeddingsService],
-  exports: [EmbeddingsService],
-})
-export class EmbeddingsModule {}
+@Module({})
+export class EmbeddingsModule {
+  static forRootAsync(): DynamicModule {
+    return {
+      module: EmbeddingsModule,
+      providers: [
+        {
+          provide: EmbeddingsExtractor,
+          inject: [ConfigService],
+          async useFactory(
+            config: ConfigService,
+          ): Promise<FeatureExtractionPipeline> {
+            const model = config.getOrThrow<string>('EMBEDDINGS_MODEL');
+
+            const extractor = await pipeline('feature-extraction', model, {
+              revision: 'default',
+            });
+
+            return extractor;
+          },
+        },
+
+        EmbeddingsService,
+      ],
+      exports: [EmbeddingsService, EmbeddingsExtractor],
+    };
+  }
+}

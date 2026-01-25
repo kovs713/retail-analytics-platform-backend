@@ -1,26 +1,17 @@
+import { EmbeddingsExtractor } from '@/common/types/providers.type';
 import { Embeddings } from '@langchain/core/embeddings';
-import { Injectable, Logger } from '@nestjs/common';
-import { XenovaEmbeddings } from './xenovaEmbeddings.impl';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { FeatureExtractionPipeline } from '@xenova/transformers';
 
 @Injectable()
-export class EmbeddingsService {
+export class EmbeddingsService extends Embeddings {
   private readonly logger = new Logger(EmbeddingsService.name);
-  private embeddingsInstance: XenovaEmbeddings | null = null;
 
-  constructor() {
-    void this.initializeEmbeddings();
-  }
-
-  private initializeEmbeddings() {
-    try {
-      this.embeddingsInstance = new XenovaEmbeddings();
-      this.logger.log(
-        'Embeddings service initialized with Xenova Transformers',
-      );
-    } catch (error) {
-      this.logger.error('Failed to initialize embeddings:', error);
-      throw error;
-    }
+  constructor(
+    @Inject(EmbeddingsExtractor)
+    private readonly extractor: FeatureExtractionPipeline,
+  ) {
+    super({});
   }
 
   /**
@@ -30,13 +21,11 @@ export class EmbeddingsService {
    */
   async embedQuery(text: string): Promise<number[]> {
     try {
-      if (!this.embeddingsInstance) {
-        this.initializeEmbeddings();
-      }
-      if (!this.embeddingsInstance) {
-        throw new Error('Embeddings instance not initialized');
-      }
-      return await this.embeddingsInstance.embedQuery(text);
+      const output = await this.extractor(text, {
+        pooling: 'mean',
+        normalize: true,
+      });
+      return Array.from(output.data as number[]);
     } catch (error) {
       this.logger.error(
         `Failed to embed query: ${(error as Error).message}`,
@@ -53,13 +42,15 @@ export class EmbeddingsService {
    */
   async embedDocuments(texts: string[]): Promise<number[][]> {
     try {
-      if (!this.embeddingsInstance) {
-        this.initializeEmbeddings();
-      }
-      if (!this.embeddingsInstance) {
-        throw new Error('Embeddings instance not initialized');
-      }
-      return await this.embeddingsInstance.embedDocuments(texts);
+      const results = await Promise.all(
+        texts.map((text) =>
+          this.extractor(text, {
+            pooling: 'mean',
+            normalize: true,
+          }),
+        ),
+      );
+      return results.map((output) => Array.from(output.data as number[]));
     } catch (error) {
       this.logger.error(
         `Failed to embed documents: ${(error as Error).message}`,
@@ -67,16 +58,5 @@ export class EmbeddingsService {
       );
       throw error;
     }
-  }
-
-  /**
-   * Get the LangChain-compatible embeddings instance
-   * @returns Promise<Embeddings> - Compatible with LangChain
-   */
-  getEmbeddings(): Embeddings {
-    if (!this.embeddingsInstance) {
-      this.initializeEmbeddings();
-    }
-    return this.embeddingsInstance!;
   }
 }

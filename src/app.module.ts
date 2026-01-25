@@ -17,8 +17,9 @@ import {
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
     }),
+    // Rag domain modules
     RagModule,
-    EmbeddingsModule,
+    EmbeddingsModule.forRootAsync(),
     LLMModule,
     VectorStoreModule,
   ],

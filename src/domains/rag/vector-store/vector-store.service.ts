@@ -30,7 +30,7 @@ export class VectorStoreService {
       );
 
       // Initialize Chroma vector store with our embeddings service
-      this.chromaStore = new Chroma(this.embeddingsService.getEmbeddings(), {
+      this.chromaStore = new Chroma(this.embeddingsService, {
         collectionName,
         url: 'http://localhost:8000',
       });
@@ -86,9 +86,8 @@ export class VectorStoreService {
       throw new Error('Failed to initialize vector store');
     }
     try {
-      const embeddingsInstance = this.embeddingsService.getEmbeddings();
       const resultIds = await this.chromaStore.addVectors(
-        await embeddingsInstance.embedDocuments(texts),
+        await this.embeddingsService.embedDocuments(texts),
         texts.map((text, index) => ({
           pageContent: text,
           metadata: metadatas?.[index] || {},

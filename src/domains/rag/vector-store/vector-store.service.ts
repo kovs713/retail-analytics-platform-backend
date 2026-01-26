@@ -1,51 +1,18 @@
+import { ChromaDBClient } from '@/app/common/types/providers.type';
 import { Chroma } from '@langchain/community/vectorstores/chroma';
 import { Document } from '@langchain/core/documents';
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { EmbeddingsService } from '../embeddings/embeddings.service';
 
 @Injectable()
 export class VectorStoreService {
   private readonly logger = new Logger(VectorStoreService.name);
-  private chromaStore: Chroma | null = null;
 
   constructor(
-    private configService: ConfigService,
-    private embeddingsService: EmbeddingsService,
-  ) {
-    // Defer initialization until first use to ensure ConfigService is available
-  }
-
-  private ensureInitialized(): void {
-    if (!this.chromaStore) {
-      this.initializeVectorStore();
-    }
-  }
-
-  private initializeVectorStore(): void {
-    try {
-      const collectionName = this.configService.get<string>(
-        'VECTOR_COLLECTION_NAME',
-        'documents',
-      );
-
-      // Initialize Chroma vector store with our embeddings service
-      this.chromaStore = new Chroma(this.embeddingsService, {
-        collectionName,
-        url: 'http://localhost:8000',
-      });
-
-      this.logger.log(
-        `Vector store initialized with collection: ${collectionName}`,
-      );
-    } catch (error) {
-      this.logger.error(
-        `Failed to initialize vector store: ${(error as Error).message}`,
-        (error as Error).stack,
-      );
-      throw error;
-    }
-  }
+    private readonly embeddingsService: EmbeddingsService,
+    @Inject(ChromaDBClient)
+    private readonly chromaDBClient: Chroma,
+  ) {}
 
   /**
    * Add documents to the vector store
@@ -53,12 +20,8 @@ export class VectorStoreService {
    * @returns Promise<string[]> - Array of document IDs
    */
   async addDocuments(documents: Document[]): Promise<string[]> {
-    this.ensureInitialized();
-    if (!this.chromaStore) {
-      throw new Error('Failed to initialize vector store');
-    }
     try {
-      const ids = await this.chromaStore.addDocuments(documents);
+      const ids = await this.chromaDBClient.addDocuments(documents);
       this.logger.log(`Added ${documents.length} documents to vector store`);
       return ids;
     } catch (error) {
@@ -81,12 +44,8 @@ export class VectorStoreService {
     texts: string[],
     metadatas?: Record<string, any>[],
   ): Promise<string[]> {
-    this.ensureInitialized();
-    if (!this.chromaStore) {
-      throw new Error('Failed to initialize vector store');
-    }
     try {
-      const resultIds = await this.chromaStore.addVectors(
+      const resultIds = await this.chromaDBClient.addVectors(
         await this.embeddingsService.embedDocuments(texts),
         texts.map((text, index) => ({
           pageContent: text,
@@ -116,12 +75,12 @@ export class VectorStoreService {
     k: number = 5,
     filter?: Record<string, any>,
   ): Promise<Document[]> {
-    this.ensureInitialized();
-    if (!this.chromaStore) {
-      throw new Error('Failed to initialize vector store');
-    }
     try {
-      const results = await this.chromaStore.similaritySearch(query, k, filter);
+      const results = await this.chromaDBClient.similaritySearch(
+        query,
+        k,
+        filter,
+      );
       this.logger.log(`Similarity search completed for query: "${query}"`);
       return results;
     } catch (error) {
@@ -145,12 +104,8 @@ export class VectorStoreService {
     k: number = 5,
     filter?: Record<string, any>,
   ): Promise<[Document, number][]> {
-    this.ensureInitialized();
-    if (!this.chromaStore) {
-      throw new Error('Failed to initialize vector store');
-    }
     try {
-      const results = await this.chromaStore.similaritySearchWithScore(
+      const results = await this.chromaDBClient.similaritySearchWithScore(
         query,
         k,
         filter,
@@ -174,10 +129,6 @@ export class VectorStoreService {
    * @returns Promise<void>
    */
   deleteDocuments(ids: string[]): void {
-    if (!this.chromaStore) {
-      throw new Error('Vector store not initialized');
-    }
-
     try {
       // LangChain Chroma delete method signature may vary
       // For now, we'll log a warning and not implement deletion
@@ -199,8 +150,7 @@ export class VectorStoreService {
    * @returns Chroma - The LangChain Chroma instance
    */
   getVectorStore(): Chroma {
-    this.ensureInitialized();
-    return this.chromaStore!;
+    return this.chromaDBClient;
   }
 
   /**
@@ -209,9 +159,6 @@ export class VectorStoreService {
    * @returns Retriever - LangChain retriever instance
    */
   asRetriever(searchKwargs?: { k?: number; filter?: Record<string, any> }) {
-    if (!this.chromaStore) {
-      throw new Error('Vector store not initialized');
-    }
-    return this.chromaStore.asRetriever(searchKwargs);
+    return this.chromaDBClient.asRetriever(searchKwargs);
   }
 }

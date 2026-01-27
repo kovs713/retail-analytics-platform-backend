@@ -1,3 +1,4 @@
+import { AppLogger } from '@/app/common/logger/app-logger.service';
 import { ChromaDBClient } from '@/common/types/providers.type';
 import { Chroma } from '@langchain/community/vectorstores/chroma';
 import { DynamicModule, Module } from '@nestjs/common';
@@ -32,6 +33,7 @@ export class VectorStoreModule {
           },
         },
 
+        AppLogger,
         VectorStoreService,
       ],
       exports: [VectorStoreService],

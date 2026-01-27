@@ -4,6 +4,18 @@ import { RagService } from '@/domains/rag/rag.service';
 import { VectorStoreService } from '@/domains/rag/vector-store/vector-store.service';
 import { Test, TestingModule } from '@nestjs/testing';
 
+// Mock AppLogger globally for all tests
+jest.mock('@/common/logger/app-logger.service', () => ({
+  AppLogger: jest.fn().mockImplementation((context?: string) => ({
+    log: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+    verbose: jest.fn(),
+    context: context || 'AppLogger',
+  })),
+}));
+
 describe('RagService', () => {
   let service: RagService;
   let llmService: jest.Mocked<LLMService>;

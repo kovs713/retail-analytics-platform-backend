@@ -1,12 +1,13 @@
-import { ChromaDBClient } from '@/app/common/types/providers.type';
+import { AppLogger } from '@/common/logger/app-logger.service';
+import { ChromaDBClient } from '@/common/types/providers.type';
 import { Chroma } from '@langchain/community/vectorstores/chroma';
 import { Document } from '@langchain/core/documents';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { EmbeddingsService } from '../embeddings/embeddings.service';
 
 @Injectable()
 export class VectorStoreService {
-  private readonly logger = new Logger(VectorStoreService.name);
+  private readonly logger: AppLogger = new AppLogger(VectorStoreService.name);
 
   constructor(
     private readonly embeddingsService: EmbeddingsService,

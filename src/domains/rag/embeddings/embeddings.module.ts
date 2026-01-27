@@ -1,3 +1,4 @@
+import { AppLogger } from '@/common/logger/app-logger.service';
 import { EmbeddingsExtractor } from '@/common/types/providers.type';
 import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -26,6 +27,7 @@ export class EmbeddingsModule {
           },
         },
 
+        AppLogger,
         EmbeddingsService,
       ],
       exports: [EmbeddingsService, EmbeddingsExtractor],

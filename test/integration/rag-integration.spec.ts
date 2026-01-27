@@ -25,8 +25,8 @@ describe('RAG Integration Test', () => {
     };
 
     const mockConfigService = {
-      get: jest.fn((key: string) => {
-        const config = {
+      get: jest.fn((key: string): string | undefined => {
+        const config: Record<string, string> = {
           GROQ_API_KEY: 'mock-api-key',
           VECTOR_COLLECTION_NAME: 'test-collection',
         };
@@ -120,7 +120,9 @@ describe('RAG Integration Test', () => {
 
       console.log('\nAll RAG integration tests passed!');
     } catch (error) {
-      console.error('Test failed:', error.message);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error('Test failed:', errorMessage);
       throw error;
     }
   });

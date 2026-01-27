@@ -1,11 +1,12 @@
+import { AppLogger } from '@/common/logger/app-logger.service';
 import { LLMService } from '@/domains/rag/llm/llm.service';
 import { VectorStoreService } from '@/domains/rag/vector-store/vector-store.service';
 import { Document } from '@langchain/core/documents';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class RagService {
-  private readonly logger = new Logger(RagService.name);
+  private readonly logger: AppLogger = new AppLogger(RagService.name);
 
   constructor(
     private readonly llmService: LLMService,

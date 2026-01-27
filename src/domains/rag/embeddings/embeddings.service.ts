@@ -1,11 +1,12 @@
+import { AppLogger } from '@/common/logger/app-logger.service';
 import { EmbeddingsExtractor } from '@/common/types/providers.type';
 import { Embeddings } from '@langchain/core/embeddings';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { FeatureExtractionPipeline } from '@xenova/transformers';
 
 @Injectable()
 export class EmbeddingsService extends Embeddings {
-  private readonly logger = new Logger(EmbeddingsService.name);
+  private readonly logger: AppLogger = new AppLogger(EmbeddingsService.name);
 
   constructor(
     @Inject(EmbeddingsExtractor)

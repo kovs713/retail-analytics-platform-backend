@@ -1,4 +1,5 @@
 import { RagController } from '@/api/rag/rag.controller';
+import { AppLogger } from '@/common/logger/app-logger.service';
 import { EmbeddingsModule } from '@/domains/rag/embeddings/embeddings.module';
 import { LLMModule } from '@/domains/rag/llm/llm.module';
 import { RagService } from '@/domains/rag/rag.service';
@@ -12,7 +13,7 @@ import { Module } from '@nestjs/common';
     VectorStoreModule.forRootAsync(),
   ],
   controllers: [RagController],
-  providers: [RagService],
+  providers: [RagService, AppLogger],
   exports: [RagService],
 })
 export class RagModule {}

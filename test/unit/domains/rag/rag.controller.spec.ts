@@ -46,7 +46,9 @@ describe('RagController', () => {
         sources: [mockDocument],
       };
 
-      ragService.query.mockResolvedValue(mockResponse);
+      const querySpy = jest
+        .spyOn(ragService, 'query')
+        .mockResolvedValue(mockResponse);
 
       const chatRequest = {
         message: 'Test message',
@@ -56,7 +58,7 @@ describe('RagController', () => {
 
       const result = await controller.chat(chatRequest);
 
-      expect(ragService.query).toHaveBeenCalledWith(
+      expect(querySpy).toHaveBeenCalledWith(
         chatRequest.message,
         chatRequest.maxResults,
         chatRequest.systemPrompt,
@@ -69,7 +71,7 @@ describe('RagController', () => {
             metadata: mockDocument.metadata,
           },
         ],
-        timestamp: expect.any(String),
+        timestamp: expect.any(String) as unknown,
       });
     });
   });
@@ -77,7 +79,9 @@ describe('RagController', () => {
   describe('addDocuments endpoint', () => {
     it('should call RagService.addDocuments with correct parameters', async () => {
       const mockDocIds = ['doc-1', 'doc-2'];
-      ragService.addDocuments.mockResolvedValue(mockDocIds);
+      const addDocumentsSpy = jest
+        .spyOn(ragService, 'addDocuments')
+        .mockResolvedValue(mockDocIds);
 
       const addRequest = {
         documents: [
@@ -89,7 +93,7 @@ describe('RagController', () => {
 
       const result = await controller.addDocuments(addRequest);
 
-      expect(ragService.addDocuments).toHaveBeenCalled();
+      expect(addDocumentsSpy).toHaveBeenCalled();
       expect(result.documentIds).toEqual(mockDocIds);
       expect(result.count).toBe(2);
       expect(result.timestamp).toBeDefined();

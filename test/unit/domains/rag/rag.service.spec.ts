@@ -67,13 +67,13 @@ describe('RagService', () => {
       ];
       const mockIds = ['doc-1'];
 
-      vectorStoreService.addDocuments.mockResolvedValue(mockIds);
+      const addDocumentsSpy = jest
+        .spyOn(vectorStoreService, 'addDocuments')
+        .mockResolvedValue(mockIds);
 
       const result = await service.addDocuments(mockDocuments);
 
-      expect(vectorStoreService.addDocuments).toHaveBeenCalledWith(
-        mockDocuments,
-      );
+      expect(addDocumentsSpy).toHaveBeenCalledWith(mockDocuments);
       expect(result).toEqual(mockIds);
     });
 
@@ -100,14 +100,13 @@ describe('RagService', () => {
       const mockMetadatas = [{ source: 'test' }];
       const mockIds = ['text-1'];
 
-      vectorStoreService.addTexts.mockResolvedValue(mockIds);
+      const addTextsSpy = jest
+        .spyOn(vectorStoreService, 'addTexts')
+        .mockResolvedValue(mockIds);
 
       const result = await service.addTexts(mockTexts, mockMetadatas);
 
-      expect(vectorStoreService.addTexts).toHaveBeenCalledWith(
-        mockTexts,
-        mockMetadatas,
-      );
+      expect(addTextsSpy).toHaveBeenCalledWith(mockTexts, mockMetadatas);
       expect(result).toEqual(mockIds);
     });
   });
@@ -124,16 +123,17 @@ describe('RagService', () => {
       const mockAnswer =
         'NestJS is a progressive Node.js framework for building efficient and scalable server-side applications.';
 
-      vectorStoreService.similaritySearch.mockResolvedValue(mockRelevantDocs);
-      llmService.generateText.mockResolvedValue(mockAnswer);
+      const similaritySearchSpy = jest
+        .spyOn(vectorStoreService, 'similaritySearch')
+        .mockResolvedValue(mockRelevantDocs);
+      const generateTextSpy = jest
+        .spyOn(llmService, 'generateText')
+        .mockResolvedValue(mockAnswer);
 
       const result = await service.query(mockQuery);
 
-      expect(vectorStoreService.similaritySearch).toHaveBeenCalledWith(
-        mockQuery,
-        5,
-      );
-      expect(llmService.generateText).toHaveBeenCalled();
+      expect(similaritySearchSpy).toHaveBeenCalledWith(mockQuery, 5);
+      expect(generateTextSpy).toHaveBeenCalled();
       expect(result).toEqual({
         answer: mockAnswer,
         sources: mockRelevantDocs,
@@ -145,8 +145,8 @@ describe('RagService', () => {
       const mockEmptyAnswer =
         "I don't have enough information to answer this question based on the available context.";
 
-      vectorStoreService.similaritySearch.mockResolvedValue([]);
-      llmService.generateText.mockResolvedValue(mockEmptyAnswer);
+      jest.spyOn(vectorStoreService, 'similaritySearch').mockResolvedValue([]);
+      jest.spyOn(llmService, 'generateText').mockResolvedValue(mockEmptyAnswer);
 
       const result = await service.query(mockQuery);
 
@@ -154,7 +154,8 @@ describe('RagService', () => {
         answer: mockEmptyAnswer,
         sources: [],
       });
-      expect(llmService.generateText).toHaveBeenCalled();
+      const generateTextSpy = jest.spyOn(llmService, 'generateText');
+      expect(generateTextSpy).toHaveBeenCalled();
     });
 
     it('should use custom maxResults', async () => {
@@ -167,12 +168,14 @@ describe('RagService', () => {
         },
       ];
 
-      vectorStoreService.similaritySearch.mockResolvedValue(mockRelevantDocs);
-      llmService.generateText.mockResolvedValue('Test answer');
+      const similaritySearchSpy = jest
+        .spyOn(vectorStoreService, 'similaritySearch')
+        .mockResolvedValue(mockRelevantDocs);
+      jest.spyOn(llmService, 'generateText').mockResolvedValue('Test answer');
 
       await service.query(mockQuery, mockMaxResults);
 
-      expect(vectorStoreService.similaritySearch).toHaveBeenCalledWith(
+      expect(similaritySearchSpy).toHaveBeenCalledWith(
         mockQuery,
         mockMaxResults,
       );

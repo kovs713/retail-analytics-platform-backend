@@ -9,7 +9,7 @@ import { Module } from '@nestjs/common';
 @Module({
   imports: [
     EmbeddingsModule.forRootAsync(),
-    LLMModule,
+    LLMModule.forRootAsync(),
     VectorStoreModule.forRootAsync(),
   ],
   controllers: [RagController],

@@ -1,45 +1,16 @@
+import { AppLogger } from '@/common/logger/app-logger.service';
+import { ChatGroqClient } from '@/common/types/providers.type';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { ChatGroq } from '@langchain/groq';
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class LLMService {
-  private readonly logger = new Logger(LLMService.name);
-  private llm: ChatGroq | null = null;
+  private readonly logger = new AppLogger(LLMService.name);
 
-  constructor(private configService: ConfigService) {
-    // Defer initialization until first use to ensure ConfigService is available
-  }
-
-  private ensureInitialized(): void {
-    if (!this.llm) {
-      this.initializeLLM();
-    }
-  }
-
-  private initializeLLM(): void {
-    const apiKey = this.configService.get<string>('GROQ_API_KEY');
-    const model = this.configService.get<string>(
-      'GROQ_MODEL',
-      'llama-3.3-70b-versatile',
-    );
-    const temperature = parseFloat(
-      this.configService.get<string>('GROQ_TEMPERATURE', '0.7'),
-    );
-
-    if (!apiKey) {
-      throw new Error('GROQ_API_KEY is not set in environment variables');
-    }
-
-    this.llm = new ChatGroq({
-      apiKey,
-      model,
-      temperature,
-    });
-
-    this.logger.log(`LLM service initialized with model: ${model}`);
-  }
+  constructor(
+    @Inject(ChatGroqClient) private readonly chatGroqClient: ChatGroq,
+  ) {}
 
   /**
    * Generate text response from a single prompt
@@ -48,17 +19,12 @@ export class LLMService {
    * @returns Promise<string> - The generated response
    */
   async generateText(prompt: string, systemMessage?: string): Promise<string> {
-    this.ensureInitialized();
-    if (!this.llm) {
-      throw new Error('Failed to initialize LLM service');
-    }
-
     try {
       const messages = systemMessage
         ? [new SystemMessage(systemMessage), new HumanMessage(prompt)]
         : [new HumanMessage(prompt)];
 
-      const response = await this.llm.invoke(messages);
+      const response = await this.chatGroqClient.invoke(messages);
       return response.content as string;
     } catch (error) {
       this.logger.error(
@@ -77,13 +43,8 @@ export class LLMService {
   async generateWithMessages(
     messages: (HumanMessage | SystemMessage)[],
   ): Promise<string> {
-    this.ensureInitialized();
-    if (!this.llm) {
-      throw new Error('Failed to initialize LLM service');
-    }
-
     try {
-      const response = await this.llm.invoke(messages);
+      const response = await this.chatGroqClient.invoke(messages);
       return response.content as string;
     } catch (error) {
       this.logger.error(
@@ -99,10 +60,6 @@ export class LLMService {
    * @returns Promise<ChatGroq> - The LangChain ChatGroq instance
    */
   getLLM(): ChatGroq {
-    this.ensureInitialized();
-    if (!this.llm) {
-      throw new Error('Failed to initialize LLM service');
-    }
-    return this.llm;
+    return this.chatGroqClient;
   }
 }

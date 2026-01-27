@@ -19,7 +19,7 @@ export class EmbeddingsModule {
             const model = config.getOrThrow<string>('EMBEDDINGS_MODEL');
 
             const extractor = await pipeline('feature-extraction', model, {
-              revision: 'default',
+              revision: 'main',
             });
 
             return extractor;

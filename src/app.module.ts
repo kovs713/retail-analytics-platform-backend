@@ -2,12 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfigService } from './database/typeorm-config.service';
-import {
-  EmbeddingsModule,
-  LLMModule,
-  RagModule,
-  VectorStoreModule,
-} from './domains';
+import { LLMModule, RagModule } from './domains';
 
 @Module({
   imports: [
@@ -19,9 +14,7 @@ import {
     }),
     // Rag domain modules
     RagModule,
-    EmbeddingsModule.forRootAsync(),
     LLMModule,
-    VectorStoreModule,
   ],
 })
 export class AppModule {}

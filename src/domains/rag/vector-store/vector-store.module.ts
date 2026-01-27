@@ -3,6 +3,7 @@ import { Chroma } from '@langchain/community/vectorstores/chroma';
 import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmbeddingsService } from '../embeddings/embeddings.service';
+import { EmbeddingsModule } from '../embeddings/embeddings.module';
 import { VectorStoreService } from './vector-store.service';
 
 @Module({})
@@ -10,6 +11,7 @@ export class VectorStoreModule {
   static forRootAsync(): DynamicModule {
     return {
       module: VectorStoreModule,
+      imports: [EmbeddingsModule.forRootAsync()],
       providers: [
         {
           provide: ChromaDBClient,

@@ -24,7 +24,7 @@ services:
       - platform-network
 
   chromadb:
-    image: chromadb/chroma:0.4.24
+    image: chromadb/chroma:latest
     container_name: chromadb
 
     ports:

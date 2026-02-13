@@ -24,9 +24,18 @@ export class VectorStoreModule {
             const collectionName = config.get<string>('VECTOR_COLLECTION_NAME');
             const chromadbUrl = config.get<string>('CHROMADB_URL');
 
+            const parsedUrl = new URL(chromadbUrl || 'http://localhost:8000');
+            const ssl = parsedUrl.protocol === 'https:';
+            const host = parsedUrl.hostname;
+            const port = parseInt(parsedUrl.port) || (ssl ? 443 : 80);
+
             const chromaStore = new Chroma(embeddingsService, {
               collectionName,
-              url: chromadbUrl,
+              clientParams: {
+                ssl,
+                host,
+                port,
+              },
             });
 
             return chromaStore;

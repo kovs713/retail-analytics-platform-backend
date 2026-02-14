@@ -20,8 +20,7 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
-    networks:
-      - platform-network
+    network_mode: bridge
 
   chromadb:
     image: chromadb/chroma:latest
@@ -37,8 +36,7 @@ services:
     volumes:
       - chromadb_data:/chroma/chroma
 
-    networks:
-      - platform-network
+    network_mode: bridge
 
   redis:
     image: redis:7.4-alpine
@@ -58,8 +56,7 @@ services:
     volumes:
       - redis_data:/var/lib/redis/data
 
-    networks:
-      - platform-network
+    network_mode: bridge
 
   minio:
     image: minio/minio:latest
@@ -84,14 +81,10 @@ services:
     volumes:
       - minio_data:/data
 
-    networks:
-      - platform-network
+    network_mode: bridge
 
 volumes:
   pg_data:
   redis_data:
   chromadb_data:
   minio_data:
-
-networks:
-  platform-network:
